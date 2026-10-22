@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+# Next.js build output
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+# environment (NEVER commit real keys)
+.env
+.env.local
+.env.*.local
+# test output
+coverage/
+playwright-report/
+test-results/
+# logs & OS / editor files
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.vercel
