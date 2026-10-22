@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Replace YOUR_DOMAIN with your real domain (or https://USERNAME.github.io/REPO)
-Sitemap: https://YOUR_DOMAIN/sitemap.xml
