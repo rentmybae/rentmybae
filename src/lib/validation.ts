@@ -20,9 +20,10 @@ export const signupSchema = z.object({
   dob: z.string().refine(v => isAdult(v), "You must be 18 or older to register"),
   city: z.enum(siteConfig.cities.map(c => c.slug) as [string, ...string[]], { message: "Choose a supported city" }),
   pinCode: z.string().trim().regex(/^\d{6}$/, "Enter a valid 6-digit PIN code"),
-  gender: z.enum(["female", "male", "non-binary", "prefer-not-to-say"]).optional(),
+  gender: z.preprocess(v => (v === "" ? undefined : v), z.enum(["female", "male", "non-binary", "prefer-not-to-say"]).optional()),
   accountIntent: z.enum(["customer", "companion", "both"], { message: "Choose an account type" }),
-  acceptTerms: z.literal("on", { message: "You must accept the Terms and Privacy Policy" })
+  acceptTerms: z.literal("on", { message: "You must accept the Terms and Privacy Policy" }),
+  marketingOptIn: z.literal("on").optional()
 }).superRefine((v, ctx) => {
   if (v.password !== v.confirmPassword) ctx.addIssue({ code: "custom", path: ["confirmPassword"], message: "Passwords do not match" });
   if (!toE164(v.countryCode, v.mobile)) ctx.addIssue({ code: "custom", path: ["mobile"], message: "Enter a valid mobile number for the selected country" });
@@ -30,6 +31,13 @@ export const signupSchema = z.object({
 
 export const resetSchema = z.object({ password: passwordSchema, confirmPassword: z.string() })
   .refine(v => v.password === v.confirmPassword, { path: ["confirmPassword"], message: "Passwords do not match" });
+
+export const loginSchema = z.discriminatedUnion("method", [
+  z.object({ method: z.literal("email"), email: z.string().trim().toLowerCase().email("Enter a valid email address"), password: z.string().min(1, "Enter your password") }),
+  z.object({ method: z.literal("mobile"), countryCode: z.string(), mobile: z.string().trim().min(1, "Enter your mobile number"), password: z.string().min(1, "Enter your password") })
+]).superRefine((v, ctx) => {
+  if (v.method === "mobile" && !toE164(v.countryCode, v.mobile)) ctx.addIssue({ code: "custom", path: ["mobile"], message: "Enter a valid mobile number for the selected country" });
+});
 
 export const emailSchema = z.string().trim().toLowerCase().email("Enter a valid email address");
 

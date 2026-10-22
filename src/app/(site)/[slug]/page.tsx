@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import LegalDocView from "@/components/LegalDoc";
-import { legalDocs } from "@/lib/legal-content";
+import { EFFECTIVE_DATE, legalDocs } from "@/lib/legal-content";
 import { LEGAL_SLUGS } from "@/lib/nav";
 
 export const dynamicParams = false;
@@ -17,5 +17,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params; const d = get(slug);
   if (!d) notFound();
-  return <LegalDocView doc={d} updated="21 October 2026" />;
+  return <LegalDocView doc={d} updated={EFFECTIVE_DATE} />;
 }

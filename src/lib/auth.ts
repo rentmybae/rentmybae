@@ -1,11 +1,14 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createClient, supabaseConfigured } from "./supabase/server";
 
 export type Role = "customer" | "companion" | "moderator" | "support" | "admin";
 export type Session = { id: string; email: string | null; name: string | null; roles: Role[] };
 
 export async function getSession(): Promise<Session | null> {
+  // Always render per-request: otherwise a build made without Supabase env vars freezes every page as "logged out".
+  await connection();
   if (!supabaseConfigured()) return null;
   try {
     const sb = await createClient();
